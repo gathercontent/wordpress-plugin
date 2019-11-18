@@ -211,9 +211,10 @@ class API extends Base {
 	 * @return mixed             Results of request.
 	 */
 	public function get_project_templates( $project_id ) {
-		return $this->get( 'templates?projectId=' . $project_id, array(
+		return $this->get( "projects/{$project_id}/templates", array(
 			'headers' => array(
-				'Accept' => 'application/vnd.gathercontent.v0.6+json'
+				'Accept' => 'application/vnd.gathercontent.v2+json',
+				'Content-Type' => 'application/json'
 			)
 		) );
 	}
