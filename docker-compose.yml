@@ -1,0 +1,52 @@
+version: "3.5"
+
+services:
+    worpress_nginx:
+        hostname: wordpress.gathercontent.test
+        container_name: wordpress_nginx
+        image: nginx:latest
+        expose:
+            - 80
+        working_dir: /var/www/html
+        volumes:
+            - ./docker/vhost.conf:/etc/nginx/conf.d/wordpress.conf
+            - ./logs/nginx:/var/log/nginx
+            - ./wordpress:/var/www/html
+            - wordpress_plugin_files:/var/www/html/wp-content/plugins:nocopy
+        environment:
+            VIRTUAL_HOST: "wordpress.gathercontent.test"
+            LETSENCRYPT_HOST: "wordpress.gathercontent.test"
+        links:
+            - wordpress
+        external_links:
+            - nginx
+            - db
+        restart: always
+        networks:
+            - dev
+    wordpress:
+        container_name: wordpress
+        image: wordpress:5.3.0-php7.3-fpm
+        ports:
+            - 9000
+        volumes:
+            - ./wordpress:/var/www/html
+            - wordpress_plugin_files:/var/www/html/wp-content/plugins:nocopy
+        environment:
+            WORDPRESS_DB_NAME: "wordpress"
+            WORDPRESS_DB_HOST: "db"
+            WORDPRESS_DB_USER: "homestead"
+            WORDPRESS_DB_PASSWORD: "secret"
+            WORDPRESS_DB_PORT: 3306
+        external_links:
+            - db
+            - nginx
+        restart: always
+        networks:
+            - dev
+networks:
+    dev:
+        external: true
+volumes:
+    wordpress_plugin_files:
+        external: true
